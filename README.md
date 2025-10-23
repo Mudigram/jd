@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Portfolio Website
 
-## Getting Started
+A modern, responsive portfolio website built with Next.js 16, TypeScript, and TailwindCSS. This project showcases your work, skills, and testimonials in an elegant and interactive way.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Modern Tech Stack**: Built with Next.js 16, React 19, and TypeScript
+- **Responsive Design**: Fully responsive layout that works on all devices
+- **Dynamic Pages**:
+  - Home page with project showcase
+  - Profile/About page
+  - Testimonials section
+  - Contact page
+- **Interactive Components**:
+  - Bottom Navigation
+  - Project Gallery with Modal
+  - Glass-morphism effects
+  - Custom UI components
+- **Asset Management**: Organized structure for various media types
+  - Art assets
+  - Avatars
+  - Branding materials
+  - Icons
+  - Infographics
+  - Logos
+  - Posters
+
+## 🛠️ Technology Stack
+
+- **Frontend Framework**: Next.js 16.0.0
+- **Programming Language**: TypeScript
+- **Styling**:
+  - TailwindCSS
+  - CSS Modules
+  - Framer Motion for animations
+- **UI Components**:
+  - Radix UI primitives
+  - Custom components
+- **Development Tools**:
+  - ESLint for code linting
+  - PostCSS for CSS processing
+
+## 📁 Project Structure
+
+```
+├── public/
+│   ├── assets/
+│   │   ├── art/
+│   │   ├── avatars/
+│   │   ├── branding/
+│   │   ├── icons/
+│   │   ├── infographics/
+│   │   ├── logos/
+│   │   └── posters/
+│   └── data/
+├── src/
+│   ├── app/
+│   │   ├── contact/
+│   │   ├── profile/
+│   │   └── testimonials/
+│   ├── components/
+│   │   ├── ui/
+│   │   ├── BottomNav.tsx
+│   │   ├── Gallery.tsx
+│   │   ├── GlassButton.tsx
+│   │   └── ProjectModal.tsx
+│   ├── data/
+│   │   ├── profile.json
+│   │   ├── projects.ts
+│   │   ├── socials.json
+│   │   └── testimonials.json
+│   └── lib/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   git clone https://github.com/yourusername/jd.git
+   cd jd
+   ```
 
-## Learn More
+2. **Install dependencies**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Run the development server**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-## Deploy on Vercel
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🛠️ Available Scripts
+
+- `npm run dev` - Runs the development server
+- `npm run build` - Builds the application for production
+- `npm run start` - Starts the production server
+- `npm run lint` - Runs ESLint for code linting
+
+## 🚀 Deployment
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Alternative deployment platforms:
+
+- Netlify
+- GitHub Pages
+- AWS Amplify
+
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 📝 License
+
+This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+
+---
+
+⭐️ If you found this project helpful, please consider giving it a star on GitHub!
