@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Instagram",
+    "icon": "/assets/icons/instagram.jepg",
+    "url": "https://instagram.com/yourprofile"
+  },
+  {
+    "name": "Behance",
+    "icon": "/assets/icons/behance.jpeg",
+    "url": "https://behance.net/yourprofile"
+  },
+  {
+    "name": "LinkedIn",
+    "icon": "/assets/icons/linkedin.jpeg",
+    "url": "https://linkedin.com/in/yourprofile"
+  },
+  {
+    "name": "Email",
+    "icon": "/assets/icons/email.png",
+    "url": "mailto:your@email.com"
+  },
+  {
+    "name": "Twitter",
+    "icon": "/assets/icons/twitter.png",
+    "url": "mailto:your@email.com"
+  }
+]

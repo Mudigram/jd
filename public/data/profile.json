@@ -1,0 +1,17 @@
+{
+  "name": "Julz",
+  "tagline": "Brand Designer & Visual Storyteller",
+  "bio": "I am a multidisciplinary designer passionate about creating timeless visual identities, marketing assets, and digital experiences that connect brands with people.",
+  "experience": [
+    "3+ years in freelance brand design",
+    "Worked with 20+ startups and creative brands",
+    "Delivered over 50+ projects across 10 niches"
+  ],
+  "skills": [
+    { "name": "Figma", "logo": "/assets/logos/figma.png" },
+    { "name": "Illustrator", "logo": "/assets/logos/illustrator.svg" },
+    { "name": "Photoshop", "logo": "/assets/logos/photoshop.png" },
+    { "name": "After Effects", "logo": "/assets/logos/aftereffects.svg" }
+  ],
+  "resume": "/assets/Julz-Resume.pdf"
+}

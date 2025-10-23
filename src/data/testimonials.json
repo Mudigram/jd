@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Sarah Johnson",
+    "role": "Brand Manager, BrightCo",
+    "text": "Working with him was a dream. The logo design perfectly captured our brand essence!",
+    "category": "Logo Design",
+    "avatar": "/assets/avatars/sarah.jpg"
+  },
+  {
+    "id": 2,
+    "name": "David Kim",
+    "role": "Creative Director, Flow Media",
+    "text": "Fast delivery, stunning visuals, and great communication throughout.",
+    "category": "Branding",
+    "avatar": "/assets/avatars/david.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Lisa Okoro",
+    "role": "Freelancer",
+    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
+    "category": "Illustration",
+    "avatar": "/assets/avatars/lisa.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Lisa Okoro",
+    "role": "Freelancer",
+    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
+    "category": "Illustration",
+    "avatar": "/assets/avatars/lisa.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Lisa Okoro",
+    "role": "Freelancer",
+    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
+    "category": "Illustration",
+    "avatar": "/assets/avatars/lisa.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Lisa Okoro",
+    "role": "Freelancer",
+    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
+    "category": "Illustration",
+    "avatar": "/assets/avatars/lisa.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Lisa Okoro",
+    "role": "Freelancer",
+    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
+    "category": "Illustration",
+    "avatar": "/assets/avatars/lisa.jpg"
+  }
+]
