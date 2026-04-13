@@ -31,7 +31,7 @@ export default function Gallery({ projects, onSelect }: Props) {
                 </div>
             )}
 
-            <div className={`columns-2 md:columns-3 gap-4 transition-opacity duration-300 ${allLoaded ? "opacity-100" : "opacity-0"}`}>
+            <div className={`columns-2 md:columns-3 lg:columns-4 gap-4 transition-opacity duration-300 ${allLoaded ? "opacity-100" : "opacity-0"}`}>
                 {projects.map((project) => (
                     <GalleryItem key={project.id} project={project} onSelect={onSelect} onLoad={() => setLoadedCount((n) => n + 1)} />
                 ))}
