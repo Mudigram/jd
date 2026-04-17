@@ -11,29 +11,11 @@ interface Props {
 }
 
 export default function Gallery({ projects, onSelect }: Props) {
-    const [loadedCount, setLoadedCount] = useState(0);
-
-    // detect when all images are loaded
-    const allLoaded = loadedCount >= projects.length && projects.length > 0;
-
-    //   useEffect(() => {
-    //     setLoadedCount(0);
-    //   }, [projects]);
-
     return (
         <div className="relative min-h-[200px]">
-            {/* Global skeleton while grid loading */}
-            {!allLoaded && (
-                <div className="absolute inset-0 grid grid-cols-2 md:grid-cols-3 gap-4 animate-pulse">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="h-48 bg-gray-200 rounded-2xl" />
-                    ))}
-                </div>
-            )}
-
-            <div className={`columns-2 md:columns-3 lg:columns-4 gap-4 transition-opacity duration-300 ${allLoaded ? "opacity-100" : "opacity-0"}`}>
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 transition-opacity duration-300 opacity-100">
                 {projects.map((project) => (
-                    <GalleryItem key={project.id} project={project} onSelect={onSelect} onLoad={() => setLoadedCount((n) => n + 1)} />
+                    <GalleryItem key={project.id} project={project} onSelect={onSelect} />
                 ))}
             </div>
         </div>
@@ -43,11 +25,9 @@ export default function Gallery({ projects, onSelect }: Props) {
 function GalleryItem({
     project,
     onSelect,
-    onLoad,
 }: {
     project: Project;
     onSelect: (p: Project) => void;
-    onLoad: () => void;
 }) {
     const [loaded, setLoaded] = useState(false);
 
@@ -78,10 +58,7 @@ function GalleryItem({
                     height={800}
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     className={`rounded-2xl transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
-                    onLoad={() => {
-                        setLoaded(true);
-                        onLoad();
-                    }}
+                    onLoad={() => setLoaded(true)}
                     loading="lazy"
                 />
             </motion.div>

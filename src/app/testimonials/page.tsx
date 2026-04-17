@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import testimonialsData from "@/data/testimonials.json";
+import { motion } from "framer-motion";
+import { Quote } from "lucide-react";
 
-// ✅ Define interface correctly
 interface Testimonial {
     id: number;
     name: string;
@@ -15,12 +16,14 @@ interface Testimonial {
 }
 
 export default function Testimonials() {
-    const [shuffled, setShuffled] = useState<Testimonial[]>(() =>
-        [...(testimonialsData as Testimonial[])].sort(() => 0.5 - Math.random())
-    );
+    const [shuffled, setShuffled] = useState<Testimonial[]>([]);
     const [visibleCount, setVisibleCount] = useState(6);
 
-    // ✅ Lazy load on scroll
+    useEffect(() => {
+        setShuffled([...(testimonialsData as Testimonial[])].sort(() => 0.5 - Math.random()));
+    }, []);
+
+    // Lazy load on scroll
     useEffect(() => {
         const handleScroll = () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
@@ -31,40 +34,74 @@ export default function Testimonials() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [shuffled]);
 
-    return (
-        <section className="min-h-screen py-16 px-6 bg-linear-to-b from-gray-50 to-white">
-            <h2 className="text-3xl font-bold text-center mb-10 text-gray-900">
-                Testimonials
-            </h2>
+    if (!shuffled.length) return null;
 
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                {shuffled.slice(0, visibleCount).map((t) => (
-                    <div
-                        key={t.id}
-                        className="rounded-2xl p-4 bg-linear-to-b from-white/20 to-white/10 dark:from-gray-800/30 dark:to-gray-800/10 backdrop-blur-2xl border border-white/20 shadow-lg hover:shadow-[0_0_25px_rgba(255,0,0,0.2)] hover:scale-[1.03] transition-all duration-300"
+    return (
+        <section className="min-h-screen py-16 px-6 relative overflow-hidden bg-gray-50 dark:bg-zinc-950 transition-colors">
+            {/* Vibrant Background Blobs */}
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-red-400/20 dark:bg-red-900/20 blur-3xl rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-orange-300/20 dark:bg-orange-800/10 blur-3xl rounded-full mix-blend-multiply dark:mix-blend-screen pointer-events-none" />
+            
+            <motion.div 
+                className="relative z-10 max-w-6xl mx-auto"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                }}
+            >
+                <div className="text-center mb-16 md:mb-20">
+                    <motion.h2 
+                        className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-zinc-50"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
                     >
-                        <p className="text-gray-700 text-sm mb-4 leading-relaxed">“{t.text}”</p>
-                        <div className="flex justify-between items-center mt-4">
-                            <div className="flex items-center space-x-3">
-                                <Image
-                                    src={t.avatar}
-                                    alt={t.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full object-cover"
-                                />
-                                <div>
-                                    <h3 className="font-medium text-gray-900">{t.name}</h3>
-                                    <p className="text-xs text-gray-500">{t.role}</p>
+                        Client Testimonials
+                    </motion.h2>
+                    <motion.p className="text-gray-500 dark:text-gray-400 mt-6 text-lg max-w-2xl mx-auto">
+                        Don't just take my word for it. Here is what some of the incredible brands and visionaries I've partnered with have to say.
+                    </motion.p>
+                </div>
+
+                <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+                    {shuffled.slice(0, visibleCount).map((t) => (
+                        <motion.div
+                            key={t.id}
+                            variants={{
+                                hidden: { opacity: 0, scale: 0.95, y: 20 },
+                                visible: { opacity: 1, scale: 1, y: 0 }
+                            }}
+                            className="relative break-inside-avoid rounded-3xl p-8 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-2xl border border-white/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(220,38,38,0.12)] hover:-translate-y-1.5 transition-all duration-500 group"
+                        >
+                            <Quote className="absolute top-6 right-6 h-12 w-12 text-red-900/5 dark:text-red-500/10 rotate-180 transition-transform duration-500 group-hover:scale-110" />
+                            <p className="text-gray-800 dark:text-gray-200 text-[15px] mb-8 leading-relaxed relative z-10 font-medium">"{t.text}"</p>
+                            
+                            <div className="flex justify-between items-end mt-auto">
+                                <div className="flex items-center space-x-4">
+                                    <Image
+                                        src={t.avatar}
+                                        alt={t.name}
+                                        width={52}
+                                        height={52}
+                                        className="rounded-full object-cover ring-2 ring-gray-100 dark:ring-zinc-800"
+                                    />
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 dark:text-zinc-50">{t.name}</h3>
+                                        <p className="text-xs font-semibold text-red-900 dark:text-red-500 mt-0.5">{t.role}</p>
+                                    </div>
                                 </div>
                             </div>
-                            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full whitespace-nowrap">
-                                {t.category}
-                            </span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                            
+                            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-zinc-800/60">
+                                <span className="inline-block text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-400 rounded-full border border-red-100 dark:border-red-900/20">
+                                    {t.category}
+                                </span>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </motion.div>
         </section>
     );
 }

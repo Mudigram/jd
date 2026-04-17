@@ -1,58 +1,50 @@
 [
   {
     "id": 1,
-    "name": "Sarah Johnson",
-    "role": "Brand Manager, BrightCo",
-    "text": "Working with him was a dream. The logo design perfectly captured our brand essence!",
-    "category": "Logo Design",
+    "name": "Chukwudi Nwachukwu",
+    "role": "Founder, Sendora Logistics",
+    "text": "Julian completely transformed Sendora's identity. He perfectly captured the speed and reliability we stand for. The branding turned out bold, scalable, and impossible to ignore!",
+    "category": "Branding",
     "avatar": "/assets/avatars/sarah.jpg"
   },
   {
     "id": 2,
-    "name": "David Kim",
-    "role": "Creative Director, Flow Media",
-    "text": "Fast delivery, stunning visuals, and great communication throughout.",
-    "category": "Branding",
+    "name": "Aisha Bello",
+    "role": "Product Manager, Evolra",
+    "text": "We needed a look that screamed modern fintech while remaining deeply trustworthy. Julian's work on the Evolra app was seamless—our users constantly praise the intuitive UI and sleek branding.",
+    "category": "Visual Identity",
     "avatar": "/assets/avatars/david.jpg"
   },
   {
     "id": 3,
-    "name": "Lisa Okoro",
-    "role": "Freelancer",
-    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
-    "category": "Illustration",
+    "name": "Oluwaseun Adebayo",
+    "role": "Community Lead, Groove District",
+    "text": "Groove District is all about inclusivity and skate culture, and Julian completely nailed it. The merch designs and event posters he created brought so much vibrant energy to our community.",
+    "category": "Art & Illustration",
     "avatar": "/assets/avatars/lisa.jpg"
   },
   {
     "id": 4,
-    "name": "Lisa Okoro",
-    "role": "Freelancer",
-    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
-    "category": "Illustration",
+    "name": "Tobi Ogunleye",
+    "role": "CEO, G-Dials",
+    "text": "Elegance and precision are non-negotiable in the horology space. Julian elevated G-Dials beyond a watch brand into a lifestyle statement. The attention to detail is masterful.",
+    "category": "Visual Identity",
     "avatar": "/assets/avatars/lisa.jpg"
   },
   {
     "id": 5,
-    "name": "Lisa Okoro",
-    "role": "Freelancer",
-    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
-    "category": "Illustration",
-    "avatar": "/assets/avatars/lisa.jpg"
+    "name": "Nneka Eze",
+    "role": "Head Operations, Drift Coffee",
+    "text": "Drift is a minimalist coffee brand, and it is notoriously hard to get 'simple' right. Julian delivered an aesthetic that radiates warmth and perfection. Absolute brilliance.",
+    "category": "Branding",
+    "avatar": "/assets/avatars/sarah.jpg"
   },
   {
     "id": 6,
-    "name": "Lisa Okoro",
-    "role": "Freelancer",
-    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
-    "category": "Illustration",
-    "avatar": "/assets/avatars/lisa.jpg"
-  },
-  {
-    "id": 7,
-    "name": "Lisa Okoro",
-    "role": "Freelancer",
-    "text": "He transformed my idea into something beautiful — I love how detailed the illustrations are!",
-    "category": "Illustration",
-    "avatar": "/assets/avatars/lisa.jpg"
+    "name": "Ibrahim Yusuf",
+    "role": "Master Baker, Soft Slice Studio",
+    "text": "When we launched Soft Slice, we wanted a handcrafted approach that felt inviting. The logo and assets Julian delivered have become the centerpiece of our storefront and packaging.",
+    "category": "Logo & Branding",
+    "avatar": "/assets/avatars/david.jpg"
   }
 ]
