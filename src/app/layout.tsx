@@ -55,8 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-zinc-50 min-h-screen relative pb-20 md:pb-0 md:pl-64 flex flex-col transition-colors">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <Sidebar />
