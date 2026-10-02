@@ -3,21 +3,112 @@ import fs from "fs/promises";
 import path from "path";
 import { isAuthenticated } from "@/lib/auth";
 import type { Project } from "@/data/projects";
+import bundledProjects from "@/data/projects.json";
+
+// In-memory cache for fast responses and serverless execution
+let inMemoryProjects: Project[] | null = null;
 
 const DATA_FILE_PATH = path.join(process.cwd(), "src", "data", "projects.json");
+const TMP_FILE_PATH = path.join("/tmp", "projects.json");
 
 async function readProjects(): Promise<Project[]> {
+  if (inMemoryProjects && inMemoryProjects.length > 0) {
+    return inMemoryProjects;
+  }
+
+  // 1. Try reading /tmp/projects.json (serverless instance cache)
+  try {
+    const tmpData = await fs.readFile(TMP_FILE_PATH, "utf-8");
+    const parsed = JSON.parse(tmpData);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      inMemoryProjects = parsed;
+      return parsed;
+    }
+  } catch {}
+
+  // 2. Try reading local filesystem (local development)
   try {
     const data = await fs.readFile(DATA_FILE_PATH, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Failed to read projects.json, falling back:", error);
-    return [];
-  }
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      inMemoryProjects = parsed;
+      return parsed;
+    }
+  } catch {}
+
+  // 3. Fallback to statically bundled projects (always available on Vercel)
+  inMemoryProjects = bundledProjects as Project[];
+  return inMemoryProjects;
 }
 
 async function writeProjects(projects: Project[]): Promise<void> {
-  await fs.writeFile(DATA_FILE_PATH, JSON.stringify(projects, null, 2), "utf-8");
+  inMemoryProjects = projects;
+
+  // 1. Try writing to local disk (works in local dev / VPS)
+  try {
+    await fs.writeFile(DATA_FILE_PATH, JSON.stringify(projects, null, 2), "utf-8");
+    return;
+  } catch (err: any) {
+    console.warn("Local filesystem write skipped (serverless environment):", err?.message);
+  }
+
+  // 2. Write to /tmp (writable on Vercel / AWS Lambda)
+  try {
+    await fs.writeFile(TMP_FILE_PATH, JSON.stringify(projects, null, 2), "utf-8");
+  } catch (err: any) {
+    console.warn("Could not write to /tmp:", err?.message);
+  }
+
+  // 3. If GITHUB_TOKEN & GITHUB_REPO are configured, commit directly to repo
+  const ghToken = process.env.GITHUB_TOKEN;
+  const ghRepo = process.env.GITHUB_REPO;
+  if (ghToken && ghRepo) {
+    try {
+      await commitToGitHub(ghRepo, ghToken, projects);
+    } catch (ghErr) {
+      console.error("GitHub sync error:", ghErr);
+    }
+  }
+}
+
+async function commitToGitHub(repo: string, token: string, projects: Project[]) {
+  const filePath = "src/data/projects.json";
+  const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+
+  // Get current file sha
+  const getRes = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "JulianPortfolioAdmin",
+    },
+  });
+
+  let sha: string | undefined;
+  if (getRes.ok) {
+    const fileData = await getRes.json();
+    sha = fileData.sha;
+  }
+
+  const contentBase64 = Buffer.from(
+    JSON.stringify(projects, null, 2),
+    "utf-8"
+  ).toString("base64");
+
+  await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "JulianPortfolioAdmin",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: "Update portfolio works via Admin Console",
+      content: contentBase64,
+      sha,
+    }),
+  });
 }
 
 // GET: public or admin fetch of projects
@@ -27,7 +118,7 @@ export async function GET() {
     return NextResponse.json(projects);
   } catch (error) {
     console.error("GET /api/projects error:", error);
-    return NextResponse.json({ error: "Failed to load projects" }, { status: 500 });
+    return NextResponse.json(bundledProjects as Project[]);
   }
 }
 
@@ -74,9 +165,12 @@ export async function POST(req: Request) {
     await writeProjects(updated);
 
     return NextResponse.json({ success: true, project: newProject }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("POST /api/projects error:", error);
-    return NextResponse.json({ error: "Failed to add project" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Failed to add project" },
+      { status: 500 }
+    );
   }
 }
 
@@ -120,9 +214,12 @@ export async function PUT(req: Request) {
     await writeProjects(projects);
 
     return NextResponse.json({ success: true, project: updatedProject });
-  } catch (error) {
+  } catch (error: any) {
     console.error("PUT /api/projects error:", error);
-    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Failed to update project" },
+      { status: 500 }
+    );
   }
 }
 
@@ -150,8 +247,11 @@ export async function DELETE(req: Request) {
 
     await writeProjects(filtered);
     return NextResponse.json({ success: true, deletedId: id });
-  } catch (error) {
+  } catch (error: any) {
     console.error("DELETE /api/projects error:", error);
-    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || "Failed to delete project" },
+      { status: 500 }
+    );
   }
 }

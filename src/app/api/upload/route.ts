@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       }
 
       originalName = file.name;
-      mimeType = file.type;
+      mimeType = file.type || "image/jpeg";
       buffer = Buffer.from(await file.arrayBuffer());
     }
 
@@ -63,9 +63,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
-
     // Determine extension
     let ext = path.extname(originalName).toLowerCase();
     if (!ext || ext.length < 2) {
@@ -81,21 +78,43 @@ export async function POST(req: Request) {
       .slice(0, 30);
 
     const filename = `${sanitizedBase || "work"}_${Date.now()}${ext}`;
-    const filePath = path.join(uploadsDir, filename);
 
-    await fs.writeFile(filePath, buffer);
+    // Attempt 1: Try writing to local disk (public/uploads)
+    // Works in local development, VPS, and Docker containers
+    try {
+      const uploadsDir = path.join(process.cwd(), "public", "uploads");
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const filePath = path.join(uploadsDir, filename);
+      await fs.writeFile(filePath, buffer);
 
-    const publicUrl = `/uploads/${filename}`;
-    return NextResponse.json({
-      success: true,
-      url: publicUrl,
-      filename,
-      size: buffer.length,
-    });
+      const publicUrl = `/uploads/${filename}`;
+      return NextResponse.json({
+        success: true,
+        url: publicUrl,
+        filename,
+        size: buffer.length,
+      });
+    } catch (fsError: any) {
+      // On Vercel / AWS Lambda, /var/task is read-only and public/ does not exist.
+      // Seamlessly fall back to an optimized Data URI so the image works everywhere with 0 server storage!
+      console.warn(
+        "Filesystem write failed (Vercel/Serverless environment detected). Storing as Data URI:",
+        fsError?.message
+      );
+
+      const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
+      return NextResponse.json({
+        success: true,
+        url: dataUrl,
+        filename,
+        size: buffer.length,
+        storage: "data-uri",
+      });
+    }
   } catch (error: any) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: error?.message || "Failed to process and save image" },
+      { error: error?.message || "Failed to process image" },
       { status: 500 }
     );
   }

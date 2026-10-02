@@ -23,6 +23,7 @@ import {
   Layers,
   Globe,
   Tag,
+  Download,
 } from "lucide-react";
 import type { Project } from "@/data/projects";
 
@@ -521,6 +522,21 @@ export default function AdminPage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => {
+              const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projects, null, 2));
+              const downloadAnchor = document.createElement("a");
+              downloadAnchor.setAttribute("href", dataStr);
+              downloadAnchor.setAttribute("download", "projects.json");
+              document.body.appendChild(downloadAnchor);
+              downloadAnchor.click();
+              downloadAnchor.remove();
+            }}
+            title="Download current projects.json"
+            className="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-xs font-medium inline-flex items-center gap-1.5 transition cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" /> Export JSON
+          </button>
           <Link
             href="/"
             target="_blank"
