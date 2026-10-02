@@ -1,17 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { projects, type Project } from "@/data/projects";
+import { useState, useEffect } from "react";
+import { projects as initialProjects, type Project } from "@/data/projects";
 import Gallery from "@/components/Gallery";
 import ProjectModal from "@/components/ProjectModal";
 import { motion, AnimatePresence } from "framer-motion";
 
-const categories = ["All", "Logos", "Infographics", "Posters", "Branding"] as const;
+const defaultCategories = ["All", "Logos", "Infographics", "Posters", "Branding", "Art"] as const;
 
 export default function HomePage() {
+  const [projectList, setProjectList] = useState<Project[]>(initialProjects);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<(typeof categories)[number]>("All");
+  const [active, setActive] = useState<string>("All");
+
+  useEffect(() => {
+    fetch("/api/projects", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjectList(data);
+        }
+      })
+      .catch((err) => console.error("Could not sync projects", err));
+  }, []);
 
   const handleSelect = (project: Project) => {
     setSelectedProject(project);
@@ -19,12 +31,15 @@ export default function HomePage() {
   };
 
   const filtered =
-    active === "All" ? projects : projects.filter((p) => p.category === active);
+    active === "All" ? projectList : projectList.filter((p) => p.category === active);
 
-  // category counts
-  // const categoryCounts = categories.map((c) =>
-  //   c === "All" ? projects.length : projects.filter((p) => p.category === c).length
-  // );
+  // Derive categories dynamically from existing projects
+  const uniqueCategories = Array.from(new Set(projectList.map((p) => p.category)));
+  const categories = [
+    "All",
+    ...defaultCategories.slice(1).filter((c) => uniqueCategories.includes(c)),
+    ...uniqueCategories.filter((c) => !(defaultCategories as readonly string[]).includes(c)),
+  ];
 
   return (
     <section className="p-4 md:p-0 md:px-8 pb-28 md:pb-8">

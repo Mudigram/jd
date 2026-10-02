@@ -60,6 +60,7 @@ function GalleryItem({
                     className={`rounded-2xl transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
                     onLoad={() => setLoaded(true)}
                     loading="lazy"
+                    unoptimized={project.image.startsWith("http")}
                 />
             </motion.div>
 
@@ -68,7 +69,7 @@ function GalleryItem({
                 {project.category}
             </span>
 
-            <p className="mt-2 text-sm text-gray-700 line-clamp-2">{project.title}</p>
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{project.title}</p>
         </div>
     );
 }

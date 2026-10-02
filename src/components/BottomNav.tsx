@@ -13,6 +13,8 @@ const navItems = [
 export default function BottomNav() {
     const pathname = usePathname();
 
+    if (pathname.startsWith("/admin")) return null;
+
     return (
         <nav className="md:hidden fixed bottom-4 left-4 right-4 rounded-2xl glass backdrop-blur-sm border-t shadow-sm z-50">
             <div className="flex justify-around py-2">

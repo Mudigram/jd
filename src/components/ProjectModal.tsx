@@ -1,6 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { Project } from "@/data/projects";
 
 interface Props {
@@ -15,14 +16,14 @@ export default function ProjectModal({ open, project, onClose }: Props) {
     return (
         <AnimatePresence>
             <motion.div
-                className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+                className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
                 onClick={onClose}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             >
                 <motion.div
-                    className="bg-white dark:bg-zinc-950 p-4 rounded-2xl w-full max-w-xl mx-4 max-h-[85vh] overflow-y-auto scrollbar-hide shadow-2xl"
+                    className="bg-white dark:bg-zinc-950 p-4 sm:p-6 rounded-2xl w-full max-w-xl mx-auto max-h-[85vh] overflow-y-auto scrollbar-hide shadow-2xl border border-gray-100 dark:border-zinc-850"
                     onClick={(e) => e.stopPropagation()}
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -36,6 +37,7 @@ export default function ProjectModal({ open, project, onClose }: Props) {
                             height={800}
                             className="rounded-xl w-full bg-gray-100 dark:bg-zinc-800"
                             priority
+                            unoptimized={project.image.startsWith("http")}
                         />
                         {project.additionalImages?.map((img, i) => (
                             <Image
@@ -46,18 +48,32 @@ export default function ProjectModal({ open, project, onClose }: Props) {
                                 height={800}
                                 className="rounded-xl w-full bg-gray-100 dark:bg-zinc-800"
                                 loading="lazy"
+                                unoptimized={img.startsWith("http")}
                             />
                         ))}
                     </div>
                     
                     <div className="mt-5 pb-2">
-                        <h2 className="font-semibold text-2xl text-gray-900 dark:text-zinc-50">{project.title}</h2>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{project.description}</p>
+                        <div className="flex items-start justify-between gap-3">
+                            <h2 className="font-semibold text-2xl text-gray-900 dark:text-zinc-50">{project.title}</h2>
+                            {project.behanceUrl && (
+                                <a
+                                    href={project.behanceUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-xs font-medium transition"
+                                >
+                                    <span>Behance</span>
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                            )}
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400 mt-2 leading-relaxed text-sm sm:text-base">{project.description}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                         {project.tools.map((tool) => (
                             <span
                                 key={tool}
-                                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                                className="text-xs bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 px-2.5 py-1 rounded-full"
                             >
                                 {tool}
                             </span>

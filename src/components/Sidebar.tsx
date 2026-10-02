@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, MessageCircle, Star, Sun, Moon, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Home, User, MessageCircle, Star, Sun, Moon, Instagram, Linkedin, Twitter, Lock } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -79,7 +79,17 @@ export default function Sidebar() {
                         </Link>
                     ))}
                 </div>
-                <p className="text-xs text-gray-400">&copy; {new Date().getFullYear()} Julian</p>
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                    <p>&copy; {new Date().getFullYear()} Julian</p>
+                    <Link
+                        href="/admin"
+                        className="hover:text-red-900 dark:hover:text-red-400 transition flex items-center gap-1 opacity-70 hover:opacity-100"
+                        title="Designer Admin Console"
+                    >
+                        <Lock className="w-3 h-3" />
+                        <span>Admin</span>
+                    </Link>
+                </div>
             </div>
         </aside>
     );
