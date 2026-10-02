@@ -29,6 +29,135 @@ import type { Project } from "@/data/projects";
 const defaultCategories = ["Logos", "Infographics", "Posters", "Branding", "Art"];
 const commonTools = ["Illustrator", "Photoshop", "Figma", "Canva", "After Effects", "InDesign", "Blender"];
 
+// Helper to safely optimize high-res image files in browser to avoid 413 or timeout errors
+async function optimizeImageForUpload(file: File): Promise<{ file: File; dataUrl?: string }> {
+  // If not an image or SVG/GIF, return directly
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml" || file.type === "image/gif") {
+    return { file };
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const maxDimension = 2400;
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve({ file, dataUrl: e.target?.result as string });
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to high-res JPEG/PNG for lightweight transfer
+        const outputMime = file.type === "image/png" && file.size < 2 * 1024 * 1024 ? "image/png" : "image/jpeg";
+        const quality = 0.88;
+        const dataUrl = canvas.toDataURL(outputMime, quality);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve({ file, dataUrl });
+              return;
+            }
+            const outExt = outputMime === "image/png" ? ".png" : ".jpg";
+            const newName = file.name.replace(/\.[^.]+$/, "") + outExt;
+            const optimizedFile = new File([blob], newName, { type: outputMime, lastModified: Date.now() });
+            resolve({ file: optimizedFile, dataUrl });
+          },
+          outputMime,
+          quality
+        );
+      };
+      img.onerror = () => resolve({ file });
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => resolve({ file });
+    reader.readAsDataURL(file);
+  });
+}
+
+// Upload file to server with automatic fallback to JSON base64
+async function uploadImageFile(file: File): Promise<string> {
+  const { file: optimized, dataUrl } = await optimizeImageForUpload(file);
+
+  // Attempt 1: Standard FormData upload
+  try {
+    const formData = new FormData();
+    formData.append("file", optimized);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const text = await res.text();
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { error: text || `HTTP ${res.status}: ${res.statusText}` };
+    }
+
+    if (res.ok && data.url) {
+      return data.url;
+    }
+
+    if (res.status === 401) {
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    // If FormData had an issue, fallback to dataUrl base64 if available
+    if (dataUrl) {
+      return await uploadBase64(dataUrl, optimized.name);
+    }
+
+    throw new Error(data.error || "Upload failed");
+  } catch (err: any) {
+    if (dataUrl && !err.message?.includes("Session expired")) {
+      return await uploadBase64(dataUrl, optimized.name);
+    }
+    throw err;
+  }
+}
+
+async function uploadBase64(dataUrl: string, filename: string): Promise<string> {
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dataUrl, filename }),
+  });
+
+  const text = await res.text();
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { error: text || `HTTP ${res.status}: ${res.statusText}` };
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || "Upload failed via fallback");
+  }
+
+  return data.url;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -145,22 +274,11 @@ export default function AdminPage() {
     setUploadingCover(true);
     setFormError(null);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
-      }
-
-      setFormImage(data.url);
+      const uploadedUrl = await uploadImageFile(file);
+      setFormImage(uploadedUrl);
     } catch (err: any) {
-      setFormError(err.message || "Failed to upload cover image");
+      console.error("Cover upload error:", err);
+      setFormError(err.message || "Failed to upload cover image. Please try again.");
     } finally {
       setUploadingCover(false);
     }
@@ -173,21 +291,19 @@ export default function AdminPage() {
       const uploadedUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        if (res.ok && data.url) {
-          uploadedUrls.push(data.url);
+        try {
+          const url = await uploadImageFile(file);
+          if (url) uploadedUrls.push(url);
+        } catch (fileErr: any) {
+          console.error(`Failed to upload ${file.name}:`, fileErr);
         }
       }
 
-      setFormAdditionalImages((prev) => [...prev, ...uploadedUrls]);
+      if (uploadedUrls.length > 0) {
+        setFormAdditionalImages((prev) => [...prev, ...uploadedUrls]);
+      } else {
+        setFormError("Could not upload additional images. Please check file sizes or format.");
+      }
     } catch (err: any) {
       setFormError(err.message || "Failed to upload additional images");
     } finally {
@@ -254,8 +370,18 @@ export default function AdminPage() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: text || `HTTP ${res.status}` };
+      }
+
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Session expired. Please log in again.");
+        }
         throw new Error(data.error || "Failed to save project");
       }
 
@@ -273,9 +399,19 @@ export default function AdminPage() {
       const res = await fetch(`/api/projects?id=${id}`, {
         method: "DELETE",
       });
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: text };
+      }
+
       if (res.ok) {
         setProjects(projects.filter((p) => p.id !== id));
         setDeleteConfirmId(null);
+      } else {
+        alert(data.error || "Failed to delete project");
       }
     } catch (err) {
       console.error("Delete error", err);
@@ -313,7 +449,13 @@ export default function AdminPage() {
       const res = await fetch(
         `/api/behance/oembed?url=${encodeURIComponent(behanceInputUrl.trim())}`
       );
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: text || `HTTP ${res.status}` };
+      }
 
       if (!res.ok) {
         throw new Error(data.error || "Could not fetch Behance details");
